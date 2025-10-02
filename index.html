@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ફળો અને શાકભાજી - ટેબલ Export</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Export Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+  <style>
+    body {
+      background: #f8f9fa;
+    }
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .table thead {
+      background: linear-gradient(90deg, #007bff, #00c6ff);
+      color: white;
+    }
+    .quantity-input {
+      width: 80px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container mt-5">
+  <div class="card p-4">
+    <h2 class="text-center mb-4 text-primary">ફળો અને શાકભાજી → ટેબલ Export</h2>
+    
+    <div class="row mb-4">
+      <!-- Sabji Dropdown -->
+      <div class="col-md-4 mb-2">
+        <select class="form-select" id="sabjiDropdown">
+          <option value="">-- શાકભાજી પસંદ કરો --</option>
+          <option>મેથી</option>
+          <option>પાલક</option>
+          <option>ચોળાઈ</option>
+          <option>સરગવાના પાન</option>
+          <option>કોથમીર</option>
+          <option>રીંગણ</option>
+          <option>ભીંડા</option>
+          <option>દૂધી</option>
+          <option>તુરીયા</option>
+          <option>કાકડી</option>
+          <option>કોબી</option>
+          <option>ફૂલકોબી</option>
+          <option>વટાણા</option>
+          <option>બટાકા</option>
+          <option>ગાજર</option>
+          <option>ટમેટા</option>
+          <option>ડુંગળી</option>
+          <option>લીલા મરચાં</option>
+        </select>
+      </div>
+      <div class="col-md-2 mb-2">
+        <button class="btn btn-success w-100" onclick="addToTable('sabji')">Add Sabji</button>
+      </div>
+
+      <!-- Fruit Dropdown -->
+      <div class="col-md-4 mb-2">
+        <select class="form-select" id="fruitDropdown">
+          <option value="">-- ફળ પસંદ કરો --</option>
+          <option>કેરી</option>
+          <option>સફરજન</option>
+          <option>દાડમ</option>
+          <option>કેળું</option>
+          <option>જાંબુ</option>
+          <option>પપૈયું</option>
+          <option>દ્રાક્ષ</option>
+          <option>નારંગી</option>
+          <option>મોસંબી</option>
+          <option>લીંબુ</option>
+          <option>અનાનસ</option>
+          <option>ચીકુ</option>
+          <option>જામફળ</option>
+          <option>નાશપતી</option>
+          <option>તરબૂચ</option>
+          <option>ખરબૂચું</option>
+          <option>ખજૂર</option>
+          <option>અંજીર</option>
+        </select>
+      </div>
+      <div class="col-md-2 mb-2">
+        <button class="btn btn-warning w-100" onclick="addToTable('fruit')">Add Fruit</button>
+      </div>
+    </div>
+    
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle text-center" id="dataTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Item Type</th>
+            <th>Item Name</th>
+            <th>Quantity</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Export Buttons -->
+    <div class="d-flex flex-wrap gap-2 mt-3">
+      <button class="btn btn-success" onclick="exportExcel()">Download Excel</button>
+      <button class="btn btn-danger" onclick="exportPDF()">Download PDF</button>
+      <button class="btn btn-info" onclick="exportWord()">Download Word</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let count = 0;
+
+  function addToTable(type) {
+    let value = "";
+    let itemType = "";
+    
+    if(type === "sabji") {
+      value = document.getElementById("sabjiDropdown").value;
+      itemType = "શાકભાજી";
+    } else {
+      value = document.getElementById("fruitDropdown").value;
+      itemType = "ફળ";
+    }
+    
+    if(value === "") {
+      alert("Please select an item!");
+      return;
+    }
+    count++;
+    let table = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
+    let row = table.insertRow();
+    row.insertCell(0).innerHTML = count;
+    row.insertCell(1).innerHTML = itemType;
+    row.insertCell(2).innerHTML = value;
+    row.insertCell(3).innerHTML = `<input type="number" value="1" min="1" class="form-control quantity-input">`;
+  }
+
+  // Export to Excel
+  function exportExcel() {
+    let wb = XLSX.utils.table_to_book(document.getElementById("dataTable"), {sheet: "Sheet1"});
+    XLSX.writeFile(wb, "items.xlsx");
+  }
+
+  // Export to PDF
+  function exportPDF() {
+    let { jsPDF } = window.jspdf;
+    let doc = new jsPDF();
+    doc.text("ફળો અને શાકભાજી યાદી", 14, 10);
+    doc.autoTable({ html: "#dataTable" });
+    doc.save("items.pdf");
+  }
+
+  // Export to Word
+  function exportWord() {
+    let table = document.getElementById("dataTable").outerHTML;
+    let blob = new Blob(['\ufeff', table], { type: 'application/msword' });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "items.doc";
+    a.click();
+  }
+</script>
+
+</body>
+</html>
